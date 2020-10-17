@@ -26,12 +26,15 @@ public class UIManager : Manager<UIManager>
     //Parameters are only here to allow function to be assigned as delegate to scene loading event, may use these later to ignore main menu etc.
     void Reset(Scene scene, LoadSceneMode loadSceneMode)
     {
-        scoreText = GameObject.Find("Score Text").GetComponent<Text>();
-        totalScoreText = GameObject.Find("Total Score").GetComponent<Text>();
-        levelEndAnimator = GameObject.Find("Level End Popup").GetComponent<Animator>();
-        score = 0;
-        scoreText.text = "Score = 0";
-        levelFinished = false;
+        if(scene.name != "Main Menu")
+        {
+            scoreText = GameObject.Find("Score Text").GetComponent<Text>();
+            totalScoreText = GameObject.Find("Total Score").GetComponent<Text>();
+            levelEndAnimator = GameObject.Find("Level End Popup").GetComponent<Animator>();
+            score = 0;
+            scoreText.text = "Score = 0";
+            levelFinished = false;
+        }
     }
 
     public void CharacterEventSubscriptions(CharacterControl character)

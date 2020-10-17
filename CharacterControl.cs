@@ -30,32 +30,39 @@ public class CharacterControl : MonoBehaviour
 
     void OnTriggerEnter2D(Collider2D other)
     {
-        if(other.tag == "PointObject")
+        switch (other.tag)
         {
-            if(OnScoreChange != null)
-            {
-                OnScoreChange.Invoke(1); //When create a point object script add variable for point value
-                Manager<SoundManager>.Instance.PlaySoundEffect(SoundManager.SoundEffect.Pickup);
-            }
-            Destroy(other.gameObject); //When create a point object script create destroy object function to call
-        } else if(other.tag == "EndLevel")
-        {
-            if(OnLevelEnd != null)
-            {
-                OnLevelEnd.Invoke();
-                Manager<SoundManager>.Instance.PlaySoundEffect(SoundManager.SoundEffect.EndLevel);
-            }
-        } else if(other.tag == "DestroyPlayer")
-        {
-            if(OnPlayerDestroyed != null)
-            {
-                OnPlayerDestroyed.Invoke();
-                Manager<InputManager>.Instance.OnCharacterRelease -= ReleaseCharacter;
-                Manager<InputManager>.Instance.OnMoveLeft -= MoveLeft;
-                Manager<InputManager>.Instance.OnMoveRight -= MoveRight;
-                Manager<InputManager>.Instance.OnJump -= Jump;
-                Destroy(this.gameObject);
-            }
+            case "PointObject":
+                if (OnScoreChange != null)
+                {
+                    OnScoreChange.Invoke(1); //When create a point object script add variable for point value
+                    Manager<SoundManager>.Instance.PlaySoundEffect(SoundManager.SoundEffect.Pickup);
+                }
+                Destroy(other.gameObject); //When create a point object script create destroy object function to call
+                break;
+
+            case "EndLevel":
+                if (OnLevelEnd != null)
+                {
+                    OnLevelEnd.Invoke();
+                    Manager<SoundManager>.Instance.PlaySoundEffect(SoundManager.SoundEffect.EndLevel);
+                }
+                break;
+
+            case "DestroyPlayer":
+                if (OnPlayerDestroyed != null)
+                {
+                    OnPlayerDestroyed.Invoke();
+                    Manager<InputManager>.Instance.OnCharacterRelease -= ReleaseCharacter;
+                    Manager<InputManager>.Instance.OnMoveLeft -= MoveLeft;
+                    Manager<InputManager>.Instance.OnMoveRight -= MoveRight;
+                    Manager<InputManager>.Instance.OnJump -= Jump;
+                    Destroy(this.gameObject);
+                }
+                break;
+
+            default:
+                break;
         }
     }
 

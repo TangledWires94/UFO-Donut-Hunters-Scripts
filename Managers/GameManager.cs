@@ -34,6 +34,11 @@ public class GameManager : Manager<GameManager>
             Transform playerSpawn = GameObject.Find("Player Spawn").GetComponent<Transform>();
             CharacterControl characterControl = Instantiate(character, playerSpawn.position, playerSpawn.rotation).GetComponent<CharacterControl>();
             Manager<UIManager>.Instance.CharacterEventSubscriptions(characterControl);
+            if(SceneManager.GetActiveScene().buildIndex == 1)
+            {
+                TutorialFunctions tutorialFunctions = GameObject.Find("Tutorial Manager").GetComponent<TutorialFunctions>();
+                tutorialFunctions.SubToPlayerEvents(characterControl);
+            }
         } else
         {
             totalScore = 0;
