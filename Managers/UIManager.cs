@@ -10,6 +10,8 @@ public class UIManager : Manager<UIManager>
     public int score = 0;
     public Animator levelEndAnimator;
     public bool levelFinished;
+    public GameObject retryMenu, pauseMenu;
+    public Button startButton, resetButton, menuButton, retryMenuButton, quitButton, retryButton;
 
     // Start is called before the first frame update
     void Start()
@@ -28,12 +30,70 @@ public class UIManager : Manager<UIManager>
     {
         if(scene.name != "Main Menu")
         {
+            Manager<InputManager>.Instance.PausePressed += TogglePause;
             scoreText = GameObject.Find("Score Text").GetComponent<Text>();
             totalScoreText = GameObject.Find("Total Score").GetComponent<Text>();
             levelEndAnimator = GameObject.Find("Level End Popup").GetComponent<Animator>();
             score = 0;
             scoreText.text = "Score = 0";
             levelFinished = false;
+
+            if (GameObject.Find("StartButton") != null)
+            {
+                startButton = GameObject.Find("StartButton").GetComponent<Button>();
+                startButton.onClick.AddListener(Manager<InputManager>.Instance.ReleasePlayer);
+            }
+
+            if (GameObject.Find("ResetButton") != null)
+            {
+                resetButton = GameObject.Find("ResetButton").GetComponent<Button>();
+                resetButton.onClick.AddListener(Manager<InputManager>.Instance.Reset);
+            }
+
+            if (GameObject.Find("MainMenuButton") != null)
+            {
+                menuButton = GameObject.Find("MainMenuButton").GetComponent<Button>();
+                menuButton.onClick.AddListener(Manager<InputManager>.Instance.GoToMainMenu);
+            }
+            else
+            {
+                Debug.Log("No main menu");
+            }
+
+            if (GameObject.Find("RetryMainMenuButton") != null)
+            {
+                retryMenuButton = GameObject.Find("RetryMainMenuButton").GetComponent<Button>();
+                retryMenuButton.onClick.AddListener(Manager<InputManager>.Instance.GoToMainMenu);
+            } else
+            {
+                Debug.Log("Can't find retry main menu button");
+            }
+
+            if (GameObject.Find("QuitButton") != null)
+            {
+                quitButton = GameObject.Find("QuitButton").GetComponent<Button>();
+                quitButton.onClick.AddListener(Manager<InputManager>.Instance.QuitGame);
+            }
+
+            if (GameObject.Find("Pause Menu") != null)
+            {
+                pauseMenu = GameObject.Find("Pause Menu");
+                pauseMenu.SetActive(false);
+
+            }
+
+            if (GameObject.Find("RetryButton") != null)
+            {
+                retryButton = GameObject.Find("RetryButton").GetComponent<Button>();
+                retryButton.onClick.AddListener(Manager<InputManager>.Instance.Reset);
+            }
+            else
+            {
+                Debug.Log("Can't find retry button");
+            }
+
+            retryMenu = GameObject.Find("Retry Menu");
+            retryMenu.SetActive(false);
         }
     }
 
@@ -63,7 +123,12 @@ public class UIManager : Manager<UIManager>
         if (!levelFinished)
         {
             Manager<SoundManager>.Instance.PlaySoundEffect(SoundManager.SoundEffect.PlayerDestroyed);
-            //Add popup to show when player dies
+            retryMenu.SetActive(true);
         }
+    }
+
+    public void TogglePause(bool active)
+    {
+        pauseMenu.SetActive(active);
     }
 }

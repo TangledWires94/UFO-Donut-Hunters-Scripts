@@ -1,11 +1,8 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.ComponentModel;
 using UnityEngine;
-using UnityEngine.Assertions.Must;
 using UnityEngine.SceneManagement;
-using UnityEngine.UI;
 
 public class InputManager : Manager<InputManager>
 {
@@ -17,12 +14,16 @@ public class InputManager : Manager<InputManager>
     public event InputManagerEvent OnLeftMouseRelease;
     public event InputManagerEvent OnCharacterRelease;
 
+    public delegate void BooleanInputManagerEvent(bool active);
+    public event BooleanInputManagerEvent PausePressed;
+
+
     public enum GameState { LineDraw, MovePlayer, Paused, LevelEnd};
     public GameState state;
     public GameState lastState = GameState.LineDraw;
 
-    public Button startButton, resetButton, menuButton, quitButton;
-    public GameObject pauseMenu;
+    //public Button startButton, resetButton, menuButton, retryMenuButton, quitButton, retryButton;
+    //public GameObject pauseMenu;
 
     // Start is called before the first frame update
     void Start()
@@ -73,10 +74,17 @@ public class InputManager : Manager<InputManager>
                 {
                     state = GameState.Paused;
                     lastState = GameState.LineDraw;
-                    pauseMenu.SetActive(true);
+                    if (PausePressed != null)
+                    {
+                        PausePressed.Invoke(true);
+                    } else
+                    {
+                        Debug.Log("Not subsrcibed to pause event");
+                    }
                     Time.timeScale = 0;
                 }
                 break;
+
             case GameState.MovePlayer:
                 if (Input.GetButton("Left"))
                 {
@@ -107,7 +115,10 @@ public class InputManager : Manager<InputManager>
                 {
                     state = GameState.Paused;
                     lastState = GameState.MovePlayer;
-                    pauseMenu.SetActive(true);
+                    if(PausePressed != null)
+                    {
+                        PausePressed.Invoke(true);
+                    }
                     Time.timeScale = 0;
                 }
                 break;
@@ -117,7 +128,10 @@ public class InputManager : Manager<InputManager>
                 {
                     state = lastState;
                     Time.timeScale = 1;
-                    pauseMenu.SetActive(false);
+                    if (PausePressed != null)
+                    {
+                        PausePressed.Invoke(false);
+                    }
                 }
                 break;
 
@@ -130,7 +144,10 @@ public class InputManager : Manager<InputManager>
                     state = GameState.Paused;
                     lastState = GameState.LevelEnd;
                     Time.timeScale = 0;
-                    pauseMenu.SetActive(true);
+                    if (PausePressed != null)
+                    {
+                        PausePressed.Invoke(true);
+                    }
                 } else if (Input.anyKeyDown)
                 {
                     Manager<GameManager>.Instance.totalScore += Manager<UIManager>.Instance.score;
@@ -182,41 +199,6 @@ public class InputManager : Manager<InputManager>
 
     public void OnSceneLoad(Scene scene, LoadSceneMode loadSceneMode)
     {
-        if(GameObject.Find("StartButton") != null)
-        {
-            startButton = GameObject.Find("StartButton").GetComponent<Button>();
-            startButton.onClick.AddListener(ReleasePlayer);
-        }
-
-        if (GameObject.Find("ResetButton") != null)
-        {
-            resetButton = GameObject.Find("ResetButton").GetComponent<Button>();
-            resetButton.onClick.AddListener(Reset);
-        }
-
-        if (GameObject.Find("MainMenuButton") != null)
-        {
-            menuButton = GameObject.Find("MainMenuButton").GetComponent<Button>();
-            menuButton.onClick.AddListener(GoToMainMenu);
-        }
-        else
-        {
-            Debug.Log("No main menu");
-        }
-
-        if (GameObject.Find("QuitButton") != null)
-        {
-            quitButton = GameObject.Find("QuitButton").GetComponent<Button>();
-            quitButton.onClick.AddListener(QuitGame);
-        }
-
-        if (GameObject.Find("Pause Menu") != null)
-        {
-            pauseMenu = GameObject.Find("Pause Menu");
-            pauseMenu.SetActive(false);
-
-        }
-
         state = GameState.LineDraw;
     }
 
