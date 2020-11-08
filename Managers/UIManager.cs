@@ -12,6 +12,8 @@ public class UIManager : Manager<UIManager>
     public bool levelFinished;
     public GameObject retryMenu, pauseMenu;
     public Button startButton, resetButton, menuButton, retryMenuButton, quitButton, retryButton;
+    public Transform linePointsBar;
+    public float linePointsBarMax;
 
     // Start is called before the first frame update
     void Start()
@@ -31,6 +33,9 @@ public class UIManager : Manager<UIManager>
         if(scene.name != "Main Menu")
         {
             Manager<InputManager>.Instance.PausePressed += TogglePause;
+            linePointsBar = GameObject.Find("Points Bar").GetComponent<Transform>();
+            linePointsBarMax = linePointsBar.transform.localScale.y;
+            Manager<LineDrawingManager>.Instance.LineDrawingPointsChanged += UpdateLinePoints;
             scoreText = GameObject.Find("Score Text").GetComponent<Text>();
             totalScoreText = GameObject.Find("Total Score").GetComponent<Text>();
             levelEndAnimator = GameObject.Find("Level End Popup").GetComponent<Animator>();
@@ -130,5 +135,10 @@ public class UIManager : Manager<UIManager>
     public void TogglePause(bool active)
     {
         pauseMenu.SetActive(active);
+    }
+
+    void UpdateLinePoints(float percentage)
+    {
+        linePointsBar.localScale = new Vector2(linePointsBar.localScale.x, linePointsBarMax * percentage);
     }
 }

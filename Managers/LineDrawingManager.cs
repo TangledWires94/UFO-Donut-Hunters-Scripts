@@ -7,6 +7,10 @@ public class LineDrawingManager : Manager<LineDrawingManager>
 {
     public LineDraw activeLineDraw;
     public GameObject lineDrawPrefab;
+    public float linePoints, maxLinePoints, linePointsPerPoint;
+
+    public delegate void LineDrawingFloatEvent(float number);
+    public event LineDrawingFloatEvent LineDrawingPointsChanged;
 
     // Start is called before the first frame update
     void Start()
@@ -31,7 +35,17 @@ public class LineDrawingManager : Manager<LineDrawingManager>
 
     void AddNewPoint()
     {
-        activeLineDraw.AddLinePoint(MouseToWorldPosition());
+        if(linePoints > 0)
+        {
+            activeLineDraw.AddLinePoint(MouseToWorldPosition());
+            linePoints = linePoints - linePointsPerPoint;
+            if(linePoints < 0)
+            {
+                linePoints = 0;
+            }
+            float linePointsPercentage = (linePoints / maxLinePoints);
+            LineDrawingPointsChanged.Invoke(linePointsPercentage);
+        }
     }
 
     //Get mouse position in world space
@@ -43,6 +57,9 @@ public class LineDrawingManager : Manager<LineDrawingManager>
 
     void Reset(Scene scene, LoadSceneMode loadSceneMode)
     {
+        linePoints = maxLinePoints;
+        LevelSetup levelSetup = FindObjectOfType<LevelSetup>();
+        linePointsPerPoint = levelSetup.linePointsPerPoint;
         CreateNewLine();
         Manager<InputManager>.Instance.OnLeftClick += AddNewPoint;
         Manager<InputManager>.Instance.OnLeftMouseRelease += CreateNewLine;
